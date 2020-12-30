@@ -1,7 +1,7 @@
 /*!
- * react-currency-format - 3.0.3
- * Author : Sudhanshu Yadav
- * Copyright (c) 2016,2017 to Sudhanshu Yadav - ignitersworld.com , released under the MIT license.
+ * react-currency-format - 1.0.0
+ * Author : Mohit Gupta
+ * Copyright (c) 2016,2020 to Mohit Gupta - ignitersworld.com , released under the MIT license.
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -92,6 +92,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var propTypes = {
 	  thousandSeparator: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.oneOf([true])]),
+	  thousandSpacing: _propTypes2.default.oneOf(['2', '2s', '3', '4']),
 	  decimalSeparator: _propTypes2.default.string,
 	  decimalScale: _propTypes2.default.number,
 	  fixedDecimalScale: _propTypes2.default.bool,
@@ -119,6 +120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var defaultProps = {
 	  displayType: 'input',
 	  decimalSeparator: '.',
+	  thousandSpacing: '3',
 	  fixedDecimalScale: false,
 	  prefix: '',
 	  suffix: '',
@@ -239,7 +241,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getSeparators',
 	    value: function getSeparators() {
-	      var decimalSeparator = this.props.decimalSeparator;
+	      var _props2 = this.props,
+	          decimalSeparator = _props2.decimalSeparator,
+	          thousandSpacing = _props2.thousandSpacing;
 	      var thousandSeparator = this.props.thousandSeparator;
 
 
@@ -249,7 +253,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      return {
 	        decimalSeparator: decimalSeparator,
-	        thousandSeparator: thousandSeparator
+	        thousandSeparator: thousandSeparator,
+	        thousandSpacing: thousandSpacing
 	      };
 	    }
 	  }, {
@@ -329,10 +334,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'correctCaretPosition',
 	    value: function correctCaretPosition(value, caretPos, direction) {
-	      var _props2 = this.props,
-	          prefix = _props2.prefix,
-	          suffix = _props2.suffix,
-	          format = _props2.format;
+	      var _props3 = this.props,
+	          prefix = _props3.prefix,
+	          suffix = _props3.suffix,
+	          format = _props3.format;
 
 	      //in case of format as number limit between prefix and suffix
 
@@ -420,10 +425,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'removePrefixAndSuffix',
 	    value: function removePrefixAndSuffix(val) {
-	      var _props3 = this.props,
-	          format = _props3.format,
-	          prefix = _props3.prefix,
-	          suffix = _props3.suffix;
+	      var _props4 = this.props,
+	          format = _props4.format,
+	          prefix = _props4.prefix,
+	          suffix = _props4.suffix;
 
 	      //remove prefix and suffix
 
@@ -481,9 +486,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'removeFormatting',
 	    value: function removeFormatting(val) {
-	      var _props4 = this.props,
-	          format = _props4.format,
-	          removeFormatting = _props4.removeFormatting;
+	      var _props5 = this.props,
+	          format = _props5.format,
+	          removeFormatting = _props5.removeFormatting;
 
 	      if (!val) return val;
 
@@ -525,6 +530,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return formattedNumberAry.join('');
 	    }
 	    /**
+	     * Format the given string according to thousand separator and thousand spacing
+	     * @param {*} beforeDecimal 
+	     * @param {*} thousandSeparator 
+	     * @param {*} thousandSpacing 
+	     */
+
+	  }, {
+	    key: 'formatThousand',
+	    value: function formatThousand(beforeDecimal, thousandSeparator, thousandSpacing) {
+	      var digitalGroup = void 0;
+	      switch (thousandSpacing) {
+	        case _utils.thousandGroupSpacing.two:
+	          digitalGroup = /(\d)(?=(\d{2})+(?!\d))/g;
+	          break;
+	        case _utils.thousandGroupSpacing.twoScaled:
+	          digitalGroup = /(\d)(?=(((\d{2})+)(\d{1})(?!\d)))/g;
+	          break;
+	        case _utils.thousandGroupSpacing.four:
+	          digitalGroup = /(\d)(?=(\d{4})+(?!\d))/g;
+	          break;
+	        default:
+	          digitalGroup = /(\d)(?=(\d{3})+(?!\d))/g;
+	      }
+
+	      return beforeDecimal.replace(digitalGroup, '$1' + thousandSeparator);
+	    }
+	    /**
 	     * @param  {string} numStr Numeric string/floatString] It always have decimalSeparator as .
 	     * @return {string} formatted Value
 	     */
@@ -532,15 +564,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'formatAsNumber',
 	    value: function formatAsNumber(numStr) {
-	      var _props5 = this.props,
-	          decimalScale = _props5.decimalScale,
-	          fixedDecimalScale = _props5.fixedDecimalScale,
-	          prefix = _props5.prefix,
-	          suffix = _props5.suffix;
+	      var _props6 = this.props,
+	          decimalScale = _props6.decimalScale,
+	          fixedDecimalScale = _props6.fixedDecimalScale,
+	          prefix = _props6.prefix,
+	          suffix = _props6.suffix;
 
 	      var _getSeparators4 = this.getSeparators(),
 	          thousandSeparator = _getSeparators4.thousandSeparator,
-	          decimalSeparator = _getSeparators4.decimalSeparator;
+	          decimalSeparator = _getSeparators4.decimalSeparator,
+	          thousandSpacing = _getSeparators4.thousandSpacing;
 
 	      var hasDecimalSeparator = numStr.indexOf('.') !== -1 || decimalScale && fixedDecimalScale;
 
@@ -555,7 +588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (decimalScale !== undefined) afterDecimal = (0, _utils.limitToScale)(afterDecimal, decimalScale, fixedDecimalScale);
 
 	      if (thousandSeparator) {
-	        beforeDecimal = beforeDecimal.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + thousandSeparator);
+	        beforeDecimal = this.formatThousand(beforeDecimal, thousandSeparator, thousandSpacing);
 	      }
 
 	      //add prefix and suffix
@@ -595,13 +628,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'formatValueProp',
 	    value: function formatValueProp() {
-	      var _props6 = this.props,
-	          format = _props6.format,
-	          decimalScale = _props6.decimalScale,
-	          fixedDecimalScale = _props6.fixedDecimalScale;
 	      var _props7 = this.props,
-	          value = _props7.value,
-	          isNumericString = _props7.isNumericString;
+	          format = _props7.format,
+	          decimalScale = _props7.decimalScale,
+	          fixedDecimalScale = _props7.fixedDecimalScale;
+	      var _props8 = this.props,
+	          value = _props8.value,
+	          isNumericString = _props8.isNumericString;
 
 	      // if value is not defined return empty string
 
@@ -625,7 +658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'formatNegation',
 	    value: function formatNegation() {
-	      var value = arguments.length > 0 && arguments[0] !== undefined && arguments[0] !== null ? arguments[0] : '';
+	      var value = arguments.length > 0 && arguments[0] !== undefined && arguments[0] !== null? arguments[0] : '';
 	      var allowNegative = this.props.allowNegative;
 
 	      var negationRegex = new RegExp('(-)');
@@ -669,12 +702,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'isCharacterAFormat',
 	    value: function isCharacterAFormat(caretPos, value) {
-	      var _props8 = this.props,
-	          format = _props8.format,
-	          prefix = _props8.prefix,
-	          suffix = _props8.suffix,
-	          decimalScale = _props8.decimalScale,
-	          fixedDecimalScale = _props8.fixedDecimalScale;
+	      var _props9 = this.props,
+	          format = _props9.format,
+	          prefix = _props9.prefix,
+	          suffix = _props9.suffix,
+	          decimalScale = _props9.decimalScale,
+	          fixedDecimalScale = _props9.fixedDecimalScale;
 
 	      var _getSeparators5 = this.getSeparators(),
 	          decimalSeparator = _getSeparators5.decimalSeparator;
@@ -840,13 +873,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var selectionStart = el.selectionStart;
 
 	      var expectedCaretPosition = void 0;
-	      var _props9 = this.props,
-	          decimalScale = _props9.decimalScale,
-	          fixedDecimalScale = _props9.fixedDecimalScale,
-	          prefix = _props9.prefix,
-	          suffix = _props9.suffix,
-	          format = _props9.format,
-	          onKeyDown = _props9.onKeyDown;
+	      var _props10 = this.props,
+	          decimalScale = _props10.decimalScale,
+	          fixedDecimalScale = _props10.fixedDecimalScale,
+	          prefix = _props10.prefix,
+	          suffix = _props10.suffix,
+	          format = _props10.format,
+	          onKeyDown = _props10.onKeyDown;
 
 	      var ignoreDecimalSeparator = decimalScale !== undefined && fixedDecimalScale;
 	      var numRegex = this.getNumberRegex(false, ignoreDecimalSeparator);
@@ -946,11 +979,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _props10 = this.props,
-	          type = _props10.type,
-	          displayType = _props10.displayType,
-	          customInput = _props10.customInput,
-	          renderText = _props10.renderText;
+	      var _props11 = this.props,
+	          type = _props11.type,
+	          displayType = _props11.displayType,
+	          customInput = _props11.customInput,
+	          renderText = _props11.renderText;
 	      var value = this.state.value;
 
 
@@ -1325,6 +1358,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return false;
 	  }
 	}
+
+	var thousandGroupSpacing = exports.thousandGroupSpacing = {
+	  two: '2',
+	  twoScaled: '2s',
+	  three: '3',
+	  four: '4'
+	};
 
 /***/ })
 /******/ ])

@@ -1,15 +1,17 @@
 {
-  "presets": ["react", "es2015"],
-  "plugins": ["transform-object-assign", "transform-flow-strip-types"],
+  "presets": [
+    "react",
+    "es2015"
+  ],
+  "plugins": [
+    "transform-object-assign",
+    "transform-flow-strip-types"
+  ],
   "env": {
     "development": {
-      "plugins": [["react-transform", {
-        "transforms": [{
-          "transform": "react-transform-hmr",
-          "imports": ["react"],
-          "locals": ["module"]
-        }]
-      }]]
+      "plugins": [
+        "transform-decorators-legacy"
+      ]
     }
   }
 }
